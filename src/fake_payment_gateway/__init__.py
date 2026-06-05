@@ -1,0 +1,1 @@
+"""Fake payment gateway package."""

@@ -116,6 +116,9 @@ def authorize(
     return JSONResponse(status_code=response.status_code, content=response.body)
 
 
+@app.get("/health")
 @app.get("/v1/health")
 def health() -> dict[str, str]:
+    """Liveness probe. Exposed under both `/health` (docker-compose
+    healthcheck target) and `/v1/health` (kept for symmetry)."""
     return {"status": "ok"}

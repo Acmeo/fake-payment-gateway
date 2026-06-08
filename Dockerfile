@@ -1,5 +1,14 @@
 FROM python:3.12-slim AS base
 
+# Version is injected from outside (release workflow passes the release
+# tag as VERSION). Without .git inside the build context, hatch-vcs
+# cannot derive a version on its own; we expose VERSION via the
+# setuptools-scm override that hatch-vcs honors, so the wheel that
+# `uv sync` builds inside the image is stamped with it. Default 0.0.0
+# is for local dev builds.
+ARG VERSION=0.0.0
+ENV SETUPTOOLS_SCM_PRETEND_VERSION=${VERSION}
+
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     UV_PROJECT_ENVIRONMENT=/opt/venv \

@@ -108,3 +108,20 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+      - name: Trigger integration tests on place-order-integration
+        # Fan out to the bundle repo so it can E2E this new version
+        # against the rest of the manifest. The PAT must be a
+        # fine-grained token with `Contents: read` + `Metadata: read`
+        # on the place-order-integration repo, stored as the secret
+        # INTEGRATION_DISPATCH_TOKEN on this repo.
+        uses: peter-evans/repository-dispatch@v3
+        with:
+          token: ${{ secrets.INTEGRATION_DISPATCH_TOKEN }}
+          repository: ${{ github.repository_owner }}/place-order-integration
+          event-type: service-released
+          client-payload: |
+            {
+              "service": "${{ github.event.repository.name }}",
+              "version": "${{ steps.ver.outputs.version }}"
+            }
